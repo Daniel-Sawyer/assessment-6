@@ -13,13 +13,19 @@ var rollbar = new Rollbar({
   captureUnhandledRejections: true,
 })
 
-app.use(express.static('public'))
+app.use('/static', express.static(path.join(__dirname, 'public')))
 
-app.get('/style', express.static(path.join(__dirname, '/public/index.css')))
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.html'))
+})
 
-rollbar.log('hows it going dude')
+// app.get('/styles', (req,res) => {
+//     res.sendFile(path.join(__dirname, '/public/index.css'))
+// })
 
-app.get('/js', express.static(path.join(__dirname, '/data.js')))
+// app.get('/js', (req , res) => {
+//     res.sendFile(path.join(__dirname, 'public/index.js'))
+// })
 
 
 
@@ -27,7 +33,7 @@ app.get('/api/robots', (req, res) => {
     try {
         res.status(200).send(botsArr)
     } catch (error) {
-        console.log('ERROR GETTING BOTS', error)
+        rollbar.error('ERROR GETTING BOTS', error)
         res.sendStatus(400)
     }
 })
@@ -39,7 +45,7 @@ app.get('/api/robots/five', (req, res) => {
         let compDuo = shuffled.slice(6, 8)
         res.status(200).send({choices, compDuo})
     } catch (error) {
-        console.log('ERROR GETTING FIVE BOTS', error)
+        rollbar.error('ERROR GETTING FIVE BOTS', error)
         res.sendStatus(400)
     }
 })
@@ -70,7 +76,7 @@ app.post('/api/duel', (req, res) => {
             res.status(200).send('You won!')
         }
     } catch (error) {
-        console.log('ERROR DUELING', error)
+        rollbar.error('ERROR DUELING', error)
         res.sendStatus(400)
     }
 })
